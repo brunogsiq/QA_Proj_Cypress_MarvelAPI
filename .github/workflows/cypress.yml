@@ -1,0 +1,59 @@
+name: Teste - Github Actions com Cypress
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: '0 8 * * *'  # Roda às 08:00 UTC (ajustar para o fuso horário desejado)
+    # HORA QUEBRADA: MINUTO HORA
+    - cron: '30 13 * * *' # Roda às 12:40 UTC 
+    - cron: '0 19 * * *' # Roda às 19:00 UTC
+
+jobs:
+  e2e-tests:
+    timeout-minutes: 1260
+    runs-on: ubuntu-latest
+    container:
+      image: cypress/base:latest  # Sempre pega a versão mais recente do container Cypress
+    
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js (versão LTS)
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*  # Sempre usa a última versão LTS do Node.j
+
+      - name: Instalar dependências
+        run: |
+          npm ci
+          npm install cypress@latest --save-dev
+          npm install mochawesome mochawesome-merge mochawesome-report-generator --save-dev
+
+      - name: Rodar testes Cypress
+        uses: cypress-io/github-action@v6
+        with:
+          spec: "cypress/e2e/**/*.cy.js"  # Executa todos os testes dentro da pasta e2e
+
+      # ✅ Separando os uploads de relatórios e vídeos corretamente:
+      - name: Publicar Relatório de Testes
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-report
+          path: cypress/reports/
+          retention-days: 30  # Mantém os relatórios por 30 dias
+
+      - name: Publicar Vídeos dos Testes
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-videos
+          path: cypress/videos/
+          retention-days: 30  # Mantém os vídeos por 30 dias
