@@ -25,5 +25,8 @@
   "devDependencies": {
     "@bahmutov/cy-api": "^2.1.3",
     "cypress": "^9.7.0"
+  },
+  "dependencies": {
+    "vdt-season1-marvel-api": "file:"
   }
 }
