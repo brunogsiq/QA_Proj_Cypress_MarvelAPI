@@ -8,10 +8,6 @@ on:
     branches:
       - main
   workflow_dispatch:
-  schedule:
-    - cron: '0 8 * * *'  # Roda às 08:00 UTC (ajustar para o fuso horário desejado)
-    # HORA QUEBRADA: MINUTO HORA
-    - cron: '30 20 * * *' # Roda às 20:30 UTC 
 
 jobs:
   e2e-tests:
